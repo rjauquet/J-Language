@@ -1,0 +1,14 @@
+import java_cup.runtime.*;
+
+terminal PLUS, TIMES, LPAREN, RPAREN, NUMBER;
+non terminal expr;
+
+precedence left PLUS;
+precedence left TIMES;
+
+
+expr      ::= NUMBER 
+            | expr PLUS expr 
+            | expr TIMES expr 
+            | LPAREN expr RPAREN 
+            ;

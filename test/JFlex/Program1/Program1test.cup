@@ -1,0 +1,46 @@
+import java_cup.runtime.*;
+
+terminal  A, SUBTRACT, DIVIDE, TIMES, ADD;
+non terminal a;
+
+precedence left TIMES;
+
+start with a;
+
+a ::= a ADD a
+| a SUBTRACT a
+| a DIVIDE a
+| a TIMES a
+| A;
+
+	| expr EQEQ expr
+	| expr GT expr
+	| expr LT expr
+	| expr GTEQ expr
+	| expr LTEQ expr
+	| expr NOTEQ expr
+	
+	boolexpr ::= TRUE
+	| FALSE
+	| NOT expr
+	| expr EQEQ expr
+	| expr GT expr
+	| expr LT expr
+	| expr GTEQ expr
+	| expr LTEQ expr
+	| expr NOTEQ expr
+	;
+	
+	
+		| expr PLUS expr 
+	| expr MINUS expr
+	| expr TIMES expr
+	| expr DIV expr
+	| LPAREN expr RPAREN
+	| expr TOPOWER expr
+	| expr CONCAT expr
+	
+	
+	
+	cd location
+	java -jar java-cup-11a.jar Program1.cup

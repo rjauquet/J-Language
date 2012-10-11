@@ -1,0 +1,174 @@
+import java_cup.runtime.*;
+
+
+terminal IN, NOTIN, TDEF, CHARS, CONCAT, EQ, EQEQ, LT, GT, LTEQ, GTEQ, NOTEQ, LBRACKET, RBRACKET, LBRACE, RBRACE, NOT, OR, AND, TRUE, FALSE, INT, CHAR, BOOL, FLOAT, STR, LIST, TUPLE, SEMI, PLUS, MINUS, TIMES, DIV, TOPOWER, LPAREN, RPAREN, ID, FDEF, COL, COMMA, VOID, RETURN, IF, WHILE, ELSE, DO, REPEAT, UNTIL, DOT, STRING, INTEGER, FLOATNUM, BOOLEAN, LEN, LISTS, TUPLES;
+non terminal typedeclist, typedec, varid, tdefs, parameters, firstop, length, tdeflist, typedef, fctcall, exprstmtsemi, exprstmtnosemi, vardec, vardecassign, varassign, op, operand, program, body, declist, functlist, decl, funct, fparlist, fpar, out, exprlist, return, type, expr, exprstmt, parlist, if, while, repeat;
+
+precedence nonassoc LT, GT, LTEQ, GTEQ, NOTEQ, EQ, EQEQ;
+precedence left AND, OR;
+precedence left NOT;
+precedence left PLUS, MINUS, IN, NOTIN;
+precedence left TIMES, DIV, CONCAT;
+precedence right TOPOWER;
+
+start with program;
+
+program ::= declist functlist body {: System.out.println("======== end parsing =========="); :}
+	|
+	;
+	
+declist ::=  declist decl
+	|
+	;
+
+decl ::= vardecassign SEMI
+	| vardec SEMI
+	| typedef SEMI
+	| typedec SEMI
+	| error SEMI {: System.out.println("Error declaring variable"); :}
+	;
+	
+vardecassign ::= vardec EQ expr
+	;
+
+vardec ::= ID COL type
+	;
+	
+varassign ::= varid EQ expr
+	;
+	
+varid ::= ID
+	| ID DOT ID
+	;
+	
+functlist ::= functlist funct
+	|
+	;
+
+funct ::= FDEF ID LPAREN fparlist RPAREN COL out body
+	;
+	
+typedef ::= TDEF ID COL tdeflist
+	;
+
+tdeflist ::= tdeflist COMMA tdefs
+	| tdefs
+	;
+	
+tdefs ::= vardec
+	| ID COL ID
+	;
+
+typedec ::= ID COL ID EQ parameters
+	;
+	
+body ::= LBRACE declist exprlist return RBRACE
+	;
+
+fparlist ::= fparlist COMMA fpar
+	| fpar
+	|
+	;
+
+out ::= type
+	| VOID
+	;
+
+return ::= RETURN expr SEMI
+	| RETURN SEMI
+	|
+	;
+
+fpar ::= ID COL type
+	;
+
+type ::= INT
+	| FLOAT
+	| BOOL
+	| STR
+	| CHAR
+	| LIST
+	| TUPLE
+	;
+
+exprlist ::= exprstmt exprlist 
+	| error exprlist {: System.out.println("Error: missing statement"); :}
+	|
+	;
+
+
+exprstmt ::= exprstmtsemi SEMI 
+	| exprstmtnosemi
+	;
+	
+exprstmtsemi ::= varassign
+	| ID LPAREN parameters RPAREN
+	| repeat
+	;
+	
+exprstmtnosemi	::= if
+	| while
+	;
+
+if ::= IF LPAREN expr RPAREN body ELSE body
+	;
+
+while ::= WHILE LPAREN expr RPAREN DO body
+	;
+
+repeat ::= REPEAT body UNTIL LPAREN expr RPAREN
+	;
+	
+expr ::= expr op expr
+	| LPAREN expr RPAREN
+	| parlist
+	| NOT expr
+	| length
+	| fctcall
+	;
+
+op ::=	PLUS
+	| MINUS
+	| TIMES
+	| DIV
+	| TOPOWER
+	| AND
+	| OR
+	| LT
+	| GT
+	| LTEQ
+	| GTEQ
+	| NOTEQ
+	| EQEQ
+	| CONCAT
+	| IN
+	| NOTIN
+	;
+	
+operand ::= ID DOT ID
+	| ID LISTS
+	| INTEGER
+	| FLOATNUM
+	| BOOLEAN
+	| CHARS
+	| STRING
+	| LISTS
+	| TUPLES
+	| ID
+	;
+
+
+parameters ::= parlist
+	|
+	;
+	
+parlist ::= parlist COMMA operand
+	| operand
+	;
+
+fctcall ::= ID LPAREN parameters RPAREN
+	;
+	
+length ::= LEN LPAREN ID RPAREN
+	;
+	

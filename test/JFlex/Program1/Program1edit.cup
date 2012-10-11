@@ -1,0 +1,40 @@
+import java_cup.runtime.*;
+
+
+terminal CONCAT, EQ, EQEQ, LT, GT, LTEQ, GTEQ, NOTEQ, LBRACKET, RBRACKET, LBRACE, RBRACE, NOT, OR, AND, TRUE, FALSE, INT, CHAR, BOOL, FLOAT, STR, LIST, TUPLE, SEMI, PLUS, MINUS, TIMES, DIV, TOPOWER, LPAREN, RPAREN, MAIN, ID, FDEF, COL, COMMA, VOID, RETURN, IF, WHILE, ELSE, DO, REPEAT, UNTIL, DOT, STRING, INTEGER, FLOATNUM, BOOLEAN, LEN, LISTS, TUPLES;
+non terminal assign, op, operand, program, body, declist, functlist, decl, funct, fparlist, fpar, out, exprlist, return, type, expr, exprstmt, parlist, par, if, while, repeat;
+
+precedence nonassoc LT, GT, LTEQ, GTEQ, NOTEQ, EQ;
+precedence left AND, OR;
+precedence left NOT;
+precedence left PLUS, MINUS;
+precedence left TIMES, DIV, CONCAT;
+precedence right TOPOWER;
+
+start with program;
+
+program ::= declist functlist body {: System.out.println("========end parsing=========="); :}
+	|
+	;
+	
+	
+	
+declist ::=  declist decl
+	|
+	;
+
+decl ::= varassign SEMI
+	| vardec SEMI
+	| error SEMI {: System.out.println("Error declaring variable"); :}
+	;
+	
+varassign ::= ID COL type EQ expr
+	;
+
+vardec ::= ID COL type
+	;
+
+functlist ::= 	
+
+body ::= LPAREN RPAREN SEMI
+		;

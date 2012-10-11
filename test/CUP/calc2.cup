@@ -1,0 +1,21 @@
+import java_cup.runtime.*;
+
+terminal PLUS, TIMES, LPAREN, RPAREN, NUMBER, SEMI;
+non terminal expr, exprlist, exprstmt;
+
+precedence left PLUS;
+precedence left TIMES;
+
+exprlist ::= exprlist exprstmt
+	| exprstmt
+	;
+
+exprstmt ::= expr SEMI {: System.out.println("success"); :}
+	| error SEMI
+	;
+
+expr      ::= NUMBER 
+            | expr PLUS expr 
+            | expr TIMES expr 
+            | LPAREN expr RPAREN
+            ;

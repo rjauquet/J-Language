@@ -1,0 +1,32 @@
+To run my files on my computer I primarily used Eclipse and a Command Prompt in Microsoft Windows 7, but it should work fine completely from the command line as well. This guide assumes you have Eclipse running with functionality to use JavaCup and JFlex. It also assumes JFlex is installed, and the .jar for Cup is accessable. It also assumes that a path is set called JFPATH
+
+1.	The following files are placed in a folder:
+	a.	P.flex
+	b.	P.cup
+	c.	PParse.java
+	d.	Test.java
+	e.	java-cup-11a.jar
+	f.	all .text test files
+
+2.	in a command prompt, cd to the folder containing the above files
+
+3.	run the following to generate the sym.java and parser.java files
+	a.	java -jar java-cup-11a.jar P.cup
+
+4.	in another command prompt, do the following:
+	a.	execute set to check if JFPATH is set
+	b.	execute java –classpath %JFPATH% JFlex.Main to open the GUI for JFlex
+
+5.	In the GUI for JFlex, make sure ‘JLex compatibility’ and ‘no backup file’ are checked in the options (neither are necessary, but in an effort to keep everything the same it might be best to check both options)
+
+6.	Under ‘Lexical specification’ select the p.flex file (you might have to switch to the all-files view manually)
+
+7.	Under ‘output directory’ select the same folder as the rest of the files
+
+8.	Click ‘Generate’ to produce the Lexer.java file
+
+9.	An eclipse project was created with cup and jflex paths set, and the folder containing all files was used as the project folder.
+
+10.	In the run configuration for Test.java, the test text file was added to the program arguments.
+
+11.	Test.java reads in a text file, and prints out any errors. If it can make it through, “end parsing” prints

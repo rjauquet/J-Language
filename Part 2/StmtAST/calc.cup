@@ -1,0 +1,36 @@
+import java_cup.runtime.*;
+import ast.*;
+
+
+terminal PLUS, TIMES, LPAREN, RPAREN, EQUALS, SEMI;
+terminal Integer NUMBER;
+terminal String ID;
+
+non terminal StmtList stmtlist;
+non terminal StmtNode stmt;
+non terminal ExprNode expr;
+
+precedence left PLUS;
+precedence left TIMES;
+
+
+stmtlist ::= stmt:s stmtlist:l
+		{: RESULT = new StmtList(s,l); :}
+	    | 
+		{: RESULT = null; :}
+	    ;
+
+stmt ::= ID:s EQUALS expr:e SEMI
+		{: RESULT = new StmtNode(s,e); :}
+	    ;
+
+expr      ::= NUMBER:n
+              {: RESULT = new IntNumNode(n); :} 
+            | expr:e1 PLUS expr:e2
+              {: RESULT = new AddNode(e1,e2); :}
+            | expr:e1 TIMES expr:e2
+              {: RESULT = new TimesNode(e1,e2); :}
+            | LPAREN expr:e RPAREN
+              {: RESULT = e; :}
+	    ;
+

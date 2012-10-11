@@ -1,0 +1,22 @@
+import java_cup.runtime.*;
+
+
+terminal PLUS, TIMES, LPAREN, RPAREN;
+terminal Integer NUMBER;
+
+non terminal Integer expr;
+
+precedence left PLUS;
+precedence left TIMES;
+
+
+expr      ::= NUMBER:n
+              {: RESULT = n; :} 
+            | expr:e1 PLUS expr:e2
+              {: RESULT = new Integer(e1.intValue()+e2.intValue()); :}
+            | expr:e1 TIMES expr:e2
+              {: RESULT = new Integer(e1.intValue()*e2.intValue()); :}
+            | LPAREN expr:e RPAREN
+              {: RESULT = e; :}
+	    ;
+

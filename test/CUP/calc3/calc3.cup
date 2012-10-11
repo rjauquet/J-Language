@@ -1,0 +1,35 @@
+import java_cup.runtime.*;
+
+terminal PLUS, TIMES, LPAREN, RPAREN, NUMBER, SEMI, INT, EQ, ID, MAIN;
+non terminal expr, exprlist, exprstmt, decllist, decl, program ;
+
+precedence left PLUS;
+precedence left TIMES;
+
+
+program ::= decllist MAIN exprlist {: System.out.println("========end parsing=========="); :}
+	;
+
+decllist ::= decllist decl 
+	| 
+	;
+
+decl ::= INT ID SEMI
+	| INT ID EQ expr SEMI 
+	| error SEMI {: System.out.println("decl failed"); :}
+	; 
+
+exprlist ::= exprlist exprstmt 
+	| 
+	;
+
+exprstmt ::= ID EQ expr SEMI 
+	| error SEMI {: System.out.println("expr failed"); :}
+	;
+
+expr      ::= NUMBER 
+	    | ID
+          | expr PLUS expr 
+          | expr TIMES expr 
+          | LPAREN expr RPAREN
+          ;

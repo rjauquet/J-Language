@@ -1,0 +1,222 @@
+import java_cup.runtime.*;
+
+terminal CLASS;
+terminal ID;
+terminal PUBLIC, PRIVATE;
+terminal BOOL, INT, REAL, CHRLIST;
+terminal SEMICOLON, COLON, COMMA, DOT;
+terminal LEFTBRACE, RIGHTBRACE;
+terminal LEFTPAREN, RIGHTPAREN;
+terminal NULL;
+terminal NEW;
+terminal EQ;
+terminal NOT, OR, AND;
+terminal PLUS, MINUS, MULTIPLY, DIVIDE, POWER;
+terminal IN, NOTIN, LENGTH;
+terminal LESSTHAN, LESSTHANEQUAL, GREATERTHAN, GREATERTHANEQUAL, EQEQ, NOTEQUAL;
+terminal BOOLLITERAL, INTLITERAL, REALLITERAL, STRINGLITERAL;
+terminal IF, ELSE, REPEAT, UNTIL, RETURN;
+terminal START;
+
+non terminal operand, binary_operator, expr, modifier, type;
+non terminal source_code, class_declaration, class_declaration_list, method_declaration_list, member_declaration_list, member_declaration;
+non terminal variable_declaration, variable_declaration_assignment, object_variable_declaration, method_declaration;
+non terminal parameter_list, parameter_list2, body, statement_list;
+non terminal method_type, method_call, method_call_on_object, method_parameters, method_parameters2;
+non terminal statement, non_block_statement, block_statement, variable_assignment;
+non terminal ifelse, if, else, repeatuntil;
+non terminal return_statement;
+non terminal main, local_variable_declaration;
+non terminal member, member2;
+
+precedence right POWER;
+precedence left DIVIDE, MULTIPLY;
+precedence left PLUS, MINUS;
+
+precedence nonassoc NOT;
+precedence left OR, AND;
+
+precedence right IN, NOTIN;
+precedence nonassoc LESSTHAN, LESSTHANEQUAL, GREATERTHAN, GREATERTHANEQUAL, EQEQ, NOTEQUAL;
+
+start with source_code;
+
+type ::= BOOL| INT| REAL| CHRLIST | ID;
+
+modifier ::= PUBLIC | PRIVATE;
+
+
+class_declaration_list ::=class_declaration class_declaration_list
+|;
+
+/*
+ * foo : class {
+ * [[...]]
+ * }
+ */
+class_declaration ::= ID COLON CLASS LEFTBRACE member_declaration_list method_declaration_list RIGHTBRACE
+| error CLASS LEFTBRACE member_declaration_list method_declaration_list RIGHTBRACE {: System.out.println("Error declaring class name"); :}
+| error LEFTBRACE member_declaration_list method_declaration_list RIGHTBRACE {: System.out.println("Error no class identifier with code block"); :}
+| error RIGHTBRACE {: System.out.println("Errors found within class block"); :}
+| error {: System.out.println("Errors found within class block"); :};
+
+/*
+ * public foo : int;
+ * private bar : real = 12.34;
+ * [[...]]
+ */
+member_declaration_list ::= member_declaration_list member_declaration
+| ;
+
+member_declaration ::= modifier variable_declaration_assignment SEMICOLON
+| modifier variable_declaration SEMICOLON
+| modifier object_variable_declaration SEMICOLON
+| error SEMICOLON {: System.out.println("Error declaring variable"); :};
+
+/*
+ * foo : int
+ */
+variable_declaration ::= ID COLON type;
+
+/*
+ * foo : int = 10;
+ */
+variable_declaration_assignment ::= variable_declaration EQ expr;
+
+/*
+ * public foo() : null;
+ * private bar(a : int) : int;
+ * private baz(a : int, b : chrlist) : int;
+ * [[...]]
+ */
+method_declaration_list ::= method_declaration method_declaration_list
+| ;
+
+method_type ::= NULL | type;
+
+method_declaration ::= modifier ID LEFTPAREN parameter_list RIGHTPAREN COLON method_type body
+| error LEFTPAREN parameter_list RIGHTPAREN COLON method_type body {: System.out.println("Error missing access modifier or identifier"); :}
+| modifier ID LEFTPAREN parameter_list RIGHTPAREN error body {: System.out.println("Error return type undeclared"); :} ;
+
+//two-productions are needed to avoid ambiguity
+parameter_list ::= variable_declaration parameter_list2
+| ;
+parameter_list2 ::= COMMA variable_declaration parameter_list2
+| error variable_declaration parameter_list2 {: System.out.println("Error missing comma"); :}
+| COMMA error parameter_list2 {: System.out.println("Error missing variable"); :}
+| ;
+
+/*
+ * {
+ *   new s:sum;
+ *   s1 : int = s.sum(10,20);
+ *   s2 : real= s.sum(10.0,20.0);
+ *   if (s1 < s2 || s1 == s2) {
+ *      b : bool =  s1 + s2 / (s1+s2) >= 30;
+ *   }
+ * }
+ */
+body ::= LEFTBRACE statement_list RIGHTBRACE;
+statement_list ::= statement statement_list
+| error statement_list {: System.out.println("Error missing statement"); :}
+|;
+
+statement ::= non_block_statement SEMICOLON
+|block_statement
+|error SEMICOLON {: System.out.println("Error missing statement(s)"); :}; 
+non_block_statement ::= method_call
+| variable_assignment
+| return_statement
+| local_variable_declaration;
+block_statement ::= ifelse
+| repeatuntil;
+
+ifelse ::= if else;
+if ::= IF LEFTPAREN expr RIGHTPAREN body
+| IF error body {: System.out.println("Error IF condition missing"); :};
+else ::= ELSE body;
+
+repeatuntil ::= REPEAT body UNTIL LEFTPAREN expr RIGHTPAREN SEMICOLON
+| REPEAT body error SEMICOLON {: System.out.println("Error missing REPEAT keyword"); :};
+/*
+ * x = 5
+ */
+variable_assignment ::= ID EQ expr
+| member EQ expr;
+
+return_statement ::= RETURN | RETURN expr;
+/*
+ * s1 : int = 0
+ */
+local_variable_declaration ::= variable_declaration
+| variable_declaration_assignment
+| object_variable_declaration;
+
+/*
+ * new fooObject : FooClass;
+ */
+object_variable_declaration ::= NEW ID COLON ID;
+/*
+ * (s1 + s2 / (s1+s2) >= 30) & (length(str) < foo.bar())
+ */
+expr ::= NOT expr
+| expr binary_operator expr
+| LEFTPAREN expr RIGHTPAREN
+| operand
+| LENGTH LEFTPAREN expr RIGHTPAREN
+| method_call
+| member;
+
+binary_operator ::= PLUS
+| MINUS
+| MULTIPLY
+| DIVIDE
+| POWER
+| OR
+| AND
+| IN
+| NOTIN
+| LESSTHAN
+| LESSTHANEQUAL
+| GREATERTHAN
+| GREATERTHANEQUAL
+| EQEQ
+| NOTEQUAL;
+
+operand ::= REALLITERAL 
+| INTLITERAL 
+| BOOLLITERAL 
+| STRINGLITERAL
+| ID
+;
+
+/*
+ * s.foo.bar
+ */
+member ::= ID DOT ID member2;
+member2 ::= | DOT ID member2;
+
+/*
+ * foo.bar(1, 2, "blah").baz()
+ * foo(bar)
+ */
+method_call ::= ID method_call_on_object
+|ID LEFTPAREN method_parameters RIGHTPAREN;
+
+method_call_on_object ::= method_call_on_object DOT ID LEFTPAREN method_parameters RIGHTPAREN
+| DOT ID LEFTPAREN method_parameters RIGHTPAREN;
+
+method_parameters ::= expr method_parameters2
+| ;
+
+method_parameters2 ::= COMMA expr method_parameters2
+| ;
+
+/*
+ * start {
+ * [[...]]
+ * }
+ */
+main ::= START body;
+
+source_code ::= class_declaration_list main {: System.out.println("Parsing completed."); :};
